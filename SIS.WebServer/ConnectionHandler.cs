@@ -3,6 +3,7 @@
     using System;
     using System.Net.Sockets;
     using System.Text;
+
     using HTTP.Common;
     using HTTP.Enums;
     using HTTP.Exceptions;

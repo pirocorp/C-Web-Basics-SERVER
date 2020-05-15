@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using Common;
     using Contracts;
     using Enums;
@@ -97,25 +98,36 @@
                 .ForEach(this.Headers.AddHeader);
         }
 
+        private bool HasQueryString()
+        {
+            return this.Url.Split('?').Length > 1;
+        }
+
         private void ParseRequestQueryParameters()
         {
             // /users/profile?name="pesho"&id="asd"#fragment
-            this.Url
-                .Split('?', '#')[1]
-                .Split('&')
-                .Select(qp => qp.Split('='))
-                .ToList()
-                .ForEach(qp => this.QueryData.Add(qp[0], qp[1]));
+            if (this.HasQueryString())
+            {
+                this.Url
+                    .Split('?', '#')[1]
+                    .Split('&')
+                    .Select(qp => qp.Split('='))
+                    .ToList()
+                    .ForEach(qp => this.QueryData.Add(qp[0], qp[1]));
+            }
         }
 
         private void ParseRequestFormDataParameters(string requestBody)
         {
             //TODO: Parse Multiple Parameters By Name
-            requestBody
-                .Split('&')
-                .Select(qp => qp.Split('='))
-                .ToList()
-                .ForEach(qp => this.FormData.Add(qp[0], qp[1]));
+            if (!string.IsNullOrEmpty(requestBody))
+            {
+                requestBody
+                    .Split('&')
+                    .Select(qp => qp.Split('='))
+                    .ToList()
+                    .ForEach(qp => this.FormData.Add(qp[0], qp[1]));
+            }
         }
 
         private void ParseRequestParameters(string requestBody)
