@@ -19,5 +19,9 @@
 
         public override string ToString()
             => $"{this.Key}: {this.Value}";
+
+        public static string ContentType => "Content-Type";
+
+        public static string Location => "Location";
     }
 }
