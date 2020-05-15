@@ -1,6 +1,6 @@
 ﻿namespace SIS.Demo
 {
-    using System;
+    using Controllers;
     using HTTP.Enums;
     using WebServer;
     using WebServer.Routing;
@@ -14,7 +14,7 @@
             serverRoutingTable.Add(
                 HttpRequestMethod.Get,
                 path: "/",
-                request => new HomeController().Index(request));
+                request => new HomeController().Home(request));
 
             var server = new Server(8000, serverRoutingTable);
 

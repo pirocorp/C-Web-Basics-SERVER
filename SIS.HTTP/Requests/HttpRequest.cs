@@ -49,7 +49,9 @@
 
         private bool IsValidRequestQueryString(string queryString, string[] queryParameters)
         {
-            throw new NotImplementedException();
+            CoreValidator.ThrowIfNullOrEmpty(queryString, nameof(queryString));
+
+            return true; //TODO: REGEX QUERY STRING
         }
 
         private IEnumerable<string> ParsePlainRequestHeaders(string[] requestLines)

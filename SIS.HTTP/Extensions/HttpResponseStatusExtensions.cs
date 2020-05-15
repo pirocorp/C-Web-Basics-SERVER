@@ -1,6 +1,5 @@
 ﻿namespace SIS.HTTP.Extensions
 {
-    using System;
     using Enums;
 
     public static class HttpResponseStatusExtensions
