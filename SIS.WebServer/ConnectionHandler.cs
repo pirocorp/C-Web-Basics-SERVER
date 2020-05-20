@@ -3,7 +3,7 @@
     using System;
     using System.Net.Sockets;
     using System.Text;
-
+    using System.Threading.Tasks;
     using HTTP.Common;
     using HTTP.Enums;
     using HTTP.Exceptions;
@@ -28,11 +28,11 @@
             this._serverRoutingTable = serverRoutingTable;
         }
 
-        public void ProcessRequest()
+        public async Task ProcessRequestAsync()
         {
             try
             {
-                var httpRequest = this.ReadRequest();
+                var httpRequest = await this.ReadRequestAsync();
 
                 if (httpRequest != null)
                 {
@@ -55,14 +55,15 @@
             this._client.Shutdown(SocketShutdown.Both);
         }
 
-        private IHttpRequest ReadRequest()
+        private async Task<IHttpRequest> ReadRequestAsync()
         {
+            //Parse request from byte data
             var result = new StringBuilder();
             var data = new ArraySegment<byte>(new byte[4096]); //4KB
 
             while (true)
             {
-                var numberOfBytesRead = this._client.Receive(data.Array, SocketFlags.None);
+                var numberOfBytesRead = await this._client.ReceiveAsync(data.Array, SocketFlags.None);
 
                 if (numberOfBytesRead == 0)
                 {
