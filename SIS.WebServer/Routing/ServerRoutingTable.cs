@@ -11,7 +11,7 @@
 
     public class ServerRoutingTable : IServerRoutingTable
     {
-        private Dictionary<HttpRequestMethod, Dictionary<string, Func<IHttpRequest, IHttpResponse>>> _routingTable;
+        private readonly Dictionary<HttpRequestMethod, Dictionary<string, Func<IHttpRequest, IHttpResponse>>> _routingTable;
 
         public ServerRoutingTable()
         {
