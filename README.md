@@ -1,2 +1,2 @@
 # CSharp-Web-Basics-SERVER
-Web server build during C# Web Basics course
+This will become Simple Web Server build through C# Web Basics - януари 2020
