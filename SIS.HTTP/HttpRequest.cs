@@ -115,5 +115,7 @@
         public IEnumerable<Cookie> Cookies => this._cookies.AsReadOnly(); 
 
         public string Body { get; }
+
+        public IDictionary<string, string> SessionData { get; set; }
     }
 }
