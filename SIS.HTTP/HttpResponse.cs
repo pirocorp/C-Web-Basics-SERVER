@@ -19,13 +19,13 @@
 
         public HttpVersionType Version { get; }
 
-        public HttpResponseCode StatusCode { get; }
+        public HttpResponseCode StatusCode { get; set; }
 
         public IList<Header> Headers { get; }
 
         public IList<ResponseCookie> Cookies { get; }
 
-        public byte[] Body { get; }
+        public byte[] Body { get; set; }
 
         public override string ToString()
         {

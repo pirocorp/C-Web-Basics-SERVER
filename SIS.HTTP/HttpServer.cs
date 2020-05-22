@@ -1,6 +1,8 @@
 ﻿namespace SIS.HTTP
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
@@ -9,11 +11,13 @@
     public class HttpServer : IHttpServer
     {
         private readonly TcpListener _tcpListener;
+        private readonly IList<Route> _routingTable;
 
         //TODO: actions
-        public HttpServer(int port)
+        public HttpServer(int port, IList<Route> routingTable)
         {
             this._tcpListener = new TcpListener(IPAddress.Loopback, port);
+            this._routingTable = routingTable;
         }
 
         public async Task StartAsync()
@@ -56,24 +60,18 @@
 
                     var request = new HttpRequest(requestString);
 
-                    var content = "<h1>Random page</h1>";
+                    var route = this._routingTable
+                        .FirstOrDefault(r => 
+                            r.HttpMethod == request.Method
+                            && r.Path == request.Path);
+                    var response = new HttpResponse(HttpResponseCode.NotFound, new byte[0]);
 
-                    if (request.Path == "/")
+                    if (route != null)
                     {
-                        content = $"<h1>Hello World</h1>" + $"<h2>{DateTime.Now}</h2>" + 
-                                  $"<form method='POST'><input name='username' /><input type='submit' /></form>";
+                        response = route.Action(request);
                     }
-                    else if(request.Path == "/users/login")
-                    {
-                        content = $"<h1>Login Page</h1>";
-                    }
-
-                    var contentBytes = Encoding.UTF8.GetBytes(content);
-                    var response = new HttpResponse(HttpResponseCode.Ok, contentBytes);
 
                     response.Headers.Add(new Header("Server", "SIServer/0.01"));
-                    response.Headers.Add(new Header("Content-Type", "text/html"));
-
                     response.Cookies.Add(
                         new ResponseCookie("sid", Guid.NewGuid().ToString())
                         {
