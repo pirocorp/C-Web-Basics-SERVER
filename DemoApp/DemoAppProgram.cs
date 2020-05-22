@@ -23,6 +23,8 @@
             await httpServer.StartAsync();
         }
 
+        //TODO Action Headers to return all request headers as HTML
+
         private static HttpResponse FavIcon(HttpRequest request)
         {
             var byteContent = File.ReadAllBytes("wwwroot/favicon.ico");
