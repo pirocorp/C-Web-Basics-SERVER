@@ -6,6 +6,7 @@
     using System.Threading.Tasks;
 
     using SIS.HTTP;
+    using SIS.HTTP.Responses;
 
     public static class DemoAppProgram
     {
@@ -30,42 +31,22 @@
 
         private static HttpResponse Contact(HttpRequest request)
         {
-            var content = "<h1>Contact page</h1>";
-            var contentAsByteArray = Encoding.UTF8.GetBytes(content);
-
-            var response = new HttpResponse(HttpResponseCode.Ok, contentAsByteArray);
-            response.Headers.Add(new Header("Content-Type", "text/html"));
-            return response;
+            return new HtmlResponse("<h1>Contact page</h1>");
         }
 
-        public static HttpResponse Index(HttpRequest request)
+        private static HttpResponse Index(HttpRequest request)
         {
-            var content = "<h1>Home Page</h1><h2>TEST TEST</h2><img src='/images/img.jpeg' />";
-            var contentAsByteArray = Encoding.UTF8.GetBytes(content);
-
-            var response = new HttpResponse(HttpResponseCode.Ok, contentAsByteArray);
-            response.Headers.Add(new Header("Content-Type", "text/html"));
-            return response;
+            return new HtmlResponse("<h1>Home Page</h1><h2>TEST TEST</h2><img src='/images/img.jpeg' />");
         }
 
-        public static HttpResponse Login(HttpRequest request)
+        private static HttpResponse Login(HttpRequest request)
         {
-            var content = "<h1>Login page</h1>";
-            var contentAsByteArray = Encoding.UTF8.GetBytes(content);
-
-            var response = new HttpResponse(HttpResponseCode.Ok, contentAsByteArray);
-            response.Headers.Add(new Header("Content-Type", "text/html"));
-            return response;
+            return new HtmlResponse("<h1>Login page</h1>");
         }
 
-        public static HttpResponse DoLogin(HttpRequest request)
+        private static HttpResponse DoLogin(HttpRequest request)
         {
-            var content = "<h1>Login page</h1>";
-            var contentAsByteArray = Encoding.UTF8.GetBytes(content);
-
-            var response = new HttpResponse(HttpResponseCode.Ok, contentAsByteArray);
-            response.Headers.Add(new Header("Content-Type", "text/html"));
-            return response;
+            return new HtmlResponse("<h1>Login page</h1>");
         }
     }
 }

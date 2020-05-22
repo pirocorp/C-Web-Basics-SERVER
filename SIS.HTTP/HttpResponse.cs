@@ -6,15 +6,20 @@
     public class HttpResponse
     {
         public HttpResponse(HttpResponseCode statusCode, byte[] body)
+            :this()
         {
-            this.Headers = new List<Header>();
-            this.Cookies = new List<ResponseCookie>();
-            
-            this.Version = HttpVersionType.Http11;
             this.StatusCode = statusCode;
             this.Body = body;
 
             this.Headers.Add(new Header("Content-Length", $"{body?.Length ?? 0}"));
+        }
+
+        internal HttpResponse()
+        {
+            this.Headers = new List<Header>();
+            this.Cookies = new List<ResponseCookie>();
+
+            this.Version = HttpVersionType.Http11;
         }
 
         public HttpVersionType Version { get; }
@@ -25,7 +30,7 @@
 
         public IList<ResponseCookie> Cookies { get; }
 
-        public byte[] Body { get; }
+        public byte[] Body { get; internal set; }
 
         public override string ToString()
         {

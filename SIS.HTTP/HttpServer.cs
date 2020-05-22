@@ -59,6 +59,9 @@
 
                     var request = new HttpRequest(requestString);
 
+                    Console.WriteLine($"{request.Method} {request.Path}");
+                    Console.WriteLine(new string('=', Console.WindowWidth));
+
                     var route = this._routingTable
                         .FirstOrDefault(r => r.HttpMethod == request.Method
                                              && r.Path == request.Path);
@@ -83,9 +86,6 @@
                     await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
                     await networkStream.WriteAsync(response.Body, 0, response.Body.Length);
                     await networkStream.FlushAsync();
-                    
-                    Console.WriteLine(requestString);
-                    Console.WriteLine(new string('=', Console.WindowWidth));
                 }
                 catch (Exception e)
                 {
