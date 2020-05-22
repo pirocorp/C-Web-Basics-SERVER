@@ -1,5 +1,6 @@
 ﻿namespace DemoApp
 {
+    using System;
     using System.Collections.Generic;
     using System.Text;
     using System.Threading.Tasks;
@@ -39,7 +40,7 @@
 
         public static HttpResponse Index(HttpRequest request)
         {
-            var content = "<h1>Home page</h1>";
+            var content = "<h1>Home Page</h1><h2>TEST TEST</h2><img src='/images/img.jpeg' />";
             var contentAsByteArray = Encoding.UTF8.GetBytes(content);
 
             var response = new HttpResponse(HttpResponseCode.Ok, contentAsByteArray);

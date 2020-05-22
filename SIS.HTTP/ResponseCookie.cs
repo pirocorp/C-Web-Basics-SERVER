@@ -62,8 +62,7 @@
                 cookieBuilder.Append("; HttpOnly");
             }
 
-            cookieBuilder.AppendLine($"; SameSite={this.SameSite}");
-
+            cookieBuilder.Append($"; SameSite={this.SameSite}");
             return cookieBuilder.ToString();
         }
     }

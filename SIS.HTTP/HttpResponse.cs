@@ -25,7 +25,7 @@
 
         public IList<ResponseCookie> Cookies { get; }
 
-        public byte[] Body { get; set; }
+        public byte[] Body { get; }
 
         public override string ToString()
         {
@@ -39,7 +39,7 @@
                 _ => "HTTP/1.1",
             };
 
-            response.Append($"{versionAsString} {(int)this.StatusCode} {this.StatusCode.ToString()}" + HttpConstants.NewLine);
+            response.Append($"{versionAsString} {(int)this.StatusCode} {this.StatusCode}" + HttpConstants.NewLine);
 
             foreach (var header in this.Headers)
             {
@@ -52,7 +52,9 @@
             }
 
             response.Append(HttpConstants.NewLine);
-            return response.ToString();
+            var result = response.ToString();
+
+            return result;
         }
     }
 }

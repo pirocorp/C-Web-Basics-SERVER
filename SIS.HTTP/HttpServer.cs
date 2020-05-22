@@ -82,8 +82,8 @@
 
                     await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
                     await networkStream.WriteAsync(response.Body, 0, response.Body.Length);
-
-
+                    await networkStream.FlushAsync();
+                    
                     Console.WriteLine(requestString);
                     Console.WriteLine(new string('=', Console.WindowWidth));
                 }
