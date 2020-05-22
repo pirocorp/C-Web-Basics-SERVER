@@ -4,18 +4,15 @@
     using System.Net;
     using System.Net.Sockets;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
 
     public class HttpServer : IHttpServer
     {
-        private string _newLine;
         private readonly TcpListener _tcpListener;
 
         //TODO: actions
         public HttpServer(int port)
         {
-            this._newLine = Environment.NewLine;
             this._tcpListener = new TcpListener(IPAddress.Loopback, port);
         }
 
@@ -48,22 +45,30 @@
             using (var networkStream = tcpClient.GetStream())
             {
                 //1MB TODO: Use buffer 4KB
-                var requestBytes = new byte[1_000_000];
+                var requestBytes = new byte[1_048_576];
                 var bytesRead = await networkStream.ReadAsync(requestBytes, 0, requestBytes.Length);
                 var requestString = Encoding.UTF8.GetString(requestBytes, 0, bytesRead);
 
-                var responseText = $"<h1>Hello World</h1>" + $"<h2>{DateTime.Now}</h2>";
+                var request = new HttpRequest(requestString);
 
-                var response = "HTTP/1.1 200 OK" + this._newLine +
-                               "Server: PiroServer/1.0" + this._newLine +
-                               "Content-Type: text/html" + this._newLine +
-                               $"Set-Cookie: user=Piroman; Path=/; Expires={DateTime.UtcNow.AddMinutes(5):R}" + this._newLine + 
-                               "Set-Cookie: lang=bg; Path=/lang" + this._newLine + 
+                var content = "<h1>Random page</h1>";
+
+                if (request.Path == "/")
+                {
+                    content = $"<h1>Hello World</h1>" + $"<h2>{DateTime.Now}</h2>" + 
+                              $"<form method='POST'><input name='username' /><input type='submit' /></form>";
+                }
+
+                var response = "HTTP/1.1 200 OK" + HttpConstants.NewLine +
+                               "Server: PiroServer/1.0" + HttpConstants.NewLine +
+                               "Content-Type: text/html" + HttpConstants.NewLine +
+                               $"Set-Cookie: user=Piroman; Path=/; Expires={DateTime.UtcNow.AddMinutes(5):R}" + HttpConstants.NewLine + 
+                               "Set-Cookie: lang=bg; Path=/lang" + HttpConstants.NewLine + 
                                //"Content-Disposition: attachment; filename=niki.html" download as file + newLine +
                                //"Location: https://softuni.bg" + newLine +
-                               "Content-Length: " +responseText.Length + this._newLine +
-                               this._newLine + 
-                               responseText;
+                               "Content-Length: " +content.Length + HttpConstants.NewLine +
+                               HttpConstants.NewLine + 
+                               content;
 
                 var responseBytes = Encoding.UTF8.GetBytes(response);
                 await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
