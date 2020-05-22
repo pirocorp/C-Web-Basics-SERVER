@@ -5,31 +5,27 @@
 
     public class HttpResponse
     {
-        private readonly List<Header> _headers;
-
         public HttpResponse(HttpResponseCode statusCode, byte[] body)
         {
-            this._headers = new List<Header>();
+            this.Headers = new List<Header>();
+            this.Cookies = new List<ResponseCookie>();
             
             this.Version = HttpVersionType.Http11;
             this.StatusCode = statusCode;
             this.Body = body;
 
-            this._headers.Add(new Header("Content-Length", $"{body?.Length ?? 0}"));
+            this.Headers.Add(new Header("Content-Length", $"{body?.Length ?? 0}"));
         }
 
         public HttpVersionType Version { get; }
 
         public HttpResponseCode StatusCode { get; }
 
-        public IEnumerable<Header> Headers => this._headers.AsReadOnly();
+        public IList<Header> Headers { get; }
+
+        public IList<ResponseCookie> Cookies { get; }
 
         public byte[] Body { get; }
-
-        public void AddHeader(Header header)
-        {
-            this._headers.Add(header);
-        }
 
         public override string ToString()
         {
@@ -48,6 +44,11 @@
             foreach (var header in this.Headers)
             {
                 response.Append(header + HttpConstants.NewLine);
+            }
+
+            foreach (var cookie in this.Cookies)
+            {
+                response.Append($"Set-Cookie: {cookie}" + HttpConstants.NewLine);
             }
 
             response.Append(HttpConstants.NewLine);

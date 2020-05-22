@@ -7,10 +7,12 @@
     public class HttpRequest
     {
         private readonly List<Header> _headers;
+        private readonly List<Cookie> _cookies;
 
         public HttpRequest(string httpRequestAsString)
         {
             this._headers = new List<Header>();
+            this._cookies = new List<Cookie>();
 
             var lines = httpRequestAsString.Split(
                 new []{ HttpConstants.NewLine }, 
@@ -71,6 +73,25 @@
                         throw new HttpServerException($"Invalid header: {currentLine}");
                     }
 
+                    if (headerParts[0] == "Cookie")
+                    {
+                        var cookiesAsString = headerParts[1];
+
+                        var cookies = cookiesAsString
+                            .Split(new string[] {"; "}, StringSplitOptions.RemoveEmptyEntries);
+
+                        foreach (var cookieString in cookies)
+                        {
+                            var cookieParts = cookieString
+                                .Split(new[]{'='}, 2);
+
+                            if (cookieParts.Length == 2)
+                            {
+                                this._cookies.Add(new Cookie(cookieParts[0], cookieParts[1]));
+                            }
+                        }
+                    }
+
                     var header = new Header(headerParts[0], headerParts[1]);
                     this._headers.Add(header);
                 }
@@ -90,6 +111,8 @@
         public HttpVersionType Version { get; }
 
         public IEnumerable<Header> Headers => this._headers.AsReadOnly();
+
+        public IEnumerable<Cookie> Cookies => this._cookies.AsReadOnly(); 
 
         public string Body { get; }
     }
