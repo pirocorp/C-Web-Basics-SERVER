@@ -63,10 +63,18 @@
                     var sessionCookie = request.Cookies
                         .FirstOrDefault(c => c.Name == HttpConstants.SessionIdCookieName);
 
+                    string newSessionId = null;
+
                     if (sessionCookie != null 
                         && this._sessions.ContainsKey(sessionCookie.Value))
                     {
                         request.SessionData = this._sessions[sessionCookie.Value];
+                    }
+                    else
+                    {
+                        newSessionId = Guid.NewGuid().ToString();
+                        this._sessions[newSessionId] = new Dictionary<string, string>();
+                        request.SessionData = this._sessions[newSessionId];
                     }
 
                     Console.WriteLine($"{request.Method} {request.Path}");
@@ -85,13 +93,8 @@
 
                     response.Headers.Add(new Header("Server", "SIServer/0.01"));
 
-                    if (sessionCookie == null 
-                        || !this._sessions.ContainsKey(sessionCookie.Value))
+                    if (newSessionId != null)
                     {
-                        var newSessionId = Guid.NewGuid().ToString();
-
-                        this._sessions[newSessionId] = new Dictionary<string, string>();
-
                         response.Cookies.Add(
                             new ResponseCookie(HttpConstants.SessionIdCookieName, newSessionId)
                             {

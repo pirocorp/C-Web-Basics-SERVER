@@ -37,11 +37,15 @@
 
         private static HttpResponse Index(HttpRequest request)
         {
-            return new HtmlResponse("<h1>Home Page</h1><h2>TEST TEST</h2><img src='/images/img.jpeg' />");
+            var user = request.SessionData.ContainsKey("Username") 
+                       ? request.SessionData["Username"]
+                       : "Guest";
+            return new HtmlResponse($"<h1>Home Page. Hello, {user}</h1><h2>TEST TEST</h2><img src='/images/img.jpeg' />");
         }
 
         private static HttpResponse Login(HttpRequest request)
         {
+            request.SessionData["Username"] = "Piroman";
             return new HtmlResponse("<h1>Login page</h1>");
         }
 
