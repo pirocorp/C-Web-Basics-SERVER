@@ -42,12 +42,14 @@
 
         private async Task ProcessClientAsync(TcpClient tcpClient)
         {
+            string requestString;
+
             using (var networkStream = tcpClient.GetStream())
             {
                 //1MB TODO: Use buffer 4KB
                 var requestBytes = new byte[1_048_576];
                 var bytesRead = await networkStream.ReadAsync(requestBytes, 0, requestBytes.Length);
-                var requestString = Encoding.UTF8.GetString(requestBytes, 0, bytesRead);
+                 requestString = Encoding.UTF8.GetString(requestBytes, 0, bytesRead);
 
                 var request = new HttpRequest(requestString);
 
@@ -58,23 +60,24 @@
                     content = $"<h1>Hello World</h1>" + $"<h2>{DateTime.Now}</h2>" + 
                               $"<form method='POST'><input name='username' /><input type='submit' /></form>";
                 }
+                else if(request.Path == "/users/login")
+                {
+                    content = $"<h1>Login Page</h1>";
+                }
 
-                var response = "HTTP/1.1 200 OK" + HttpConstants.NewLine +
-                               "Server: PiroServer/1.0" + HttpConstants.NewLine +
-                               "Content-Type: text/html" + HttpConstants.NewLine +
-                               $"Set-Cookie: user=Piroman; Path=/; Expires={DateTime.UtcNow.AddMinutes(5):R}" + HttpConstants.NewLine + 
-                               "Set-Cookie: lang=bg; Path=/lang" + HttpConstants.NewLine + 
-                               //"Content-Disposition: attachment; filename=niki.html" download as file + newLine +
-                               //"Location: https://softuni.bg" + newLine +
-                               "Content-Length: " +content.Length + HttpConstants.NewLine +
-                               HttpConstants.NewLine + 
-                               content;
+                var contentBytes = Encoding.UTF8.GetBytes(content);
+                var response = new HttpResponse(HttpResponseCode.Ok, contentBytes);
 
-                var responseBytes = Encoding.UTF8.GetBytes(response);
+                response.AddHeader(new Header("Server", "SIServer/0.01"));
+                response.AddHeader(new Header("Content-Type", "text/html"));
+
+                var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
+
                 await networkStream.WriteAsync(responseBytes, 0, responseBytes.Length);
-                Console.WriteLine(requestString);
+                await networkStream.WriteAsync(response.Body, 0, response.Body.Length);
             }
             
+            Console.WriteLine(requestString);
             Console.WriteLine(new string('=', Console.WindowWidth));
         }
     }

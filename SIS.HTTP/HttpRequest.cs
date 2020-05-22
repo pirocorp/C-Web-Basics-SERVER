@@ -6,7 +6,7 @@
 
     public class HttpRequest
     {
-        private readonly IList<Header> _headers;
+        private readonly List<Header> _headers;
 
         public HttpRequest(string httpRequestAsString)
         {
@@ -89,8 +89,8 @@
 
         public HttpVersionType Version { get; }
 
-        public IEnumerable<Header> Headers => this._headers;
+        public IEnumerable<Header> Headers => this._headers.AsReadOnly();
 
-        public string Body { get; private set; }
+        public string Body { get; }
     }
 }
