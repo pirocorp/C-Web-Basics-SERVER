@@ -12,12 +12,13 @@
     {
         private readonly TcpListener _tcpListener;
         private readonly IList<Route> _routingTable;
+        private readonly IDictionary<string, IDictionary<string, string>> _sessions;
 
-        //TODO: actions
         public HttpServer(int port, IList<Route> routingTable)
         {
             this._tcpListener = new TcpListener(IPAddress.Loopback, port);
             this._routingTable = routingTable;
+            this._sessions = new Dictionary<string, IDictionary<string, string>>();
         }
 
         public async Task StartAsync()
@@ -74,12 +75,23 @@
                     }
 
                     response.Headers.Add(new Header("Server", "SIServer/0.01"));
-                    response.Cookies.Add(
-                    new ResponseCookie("sid", Guid.NewGuid().ToString())
+
+                    var sessionCookie = request.Cookies
+                            .FirstOrDefault(c => c.Name == HttpConstants.SessionIdCookieName);
+
+                    if (sessionCookie == null || !this._sessions.ContainsKey(sessionCookie.Value))
                     {
-                        HttpOnly = true,
-                        MaxAge = 3600,
-                    });
+                        var newSessionId = Guid.NewGuid().ToString();
+
+                        this._sessions[newSessionId] = new Dictionary<string, string>();
+
+                        response.Cookies.Add(
+                            new ResponseCookie(HttpConstants.SessionIdCookieName, newSessionId)
+                            {
+                                HttpOnly = true,
+                                MaxAge = 30 * 3600,
+                            });
+                    }
 
                     var responseBytes = Encoding.UTF8.GetBytes(response.ToString());
 
