@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text;
+    using System.Web;
 
     public class HttpRequest
     {
@@ -13,6 +15,9 @@
         {
             this._headers = new List<Header>();
             this._cookies = new List<Cookie>();
+
+            this.SessionData = new Dictionary<string, string>();
+            this.FormData = new Dictionary<string, string>();
 
             var lines = httpRequestAsString.Split(
                 new []{ HttpConstants.NewLine }, 
@@ -101,7 +106,14 @@
                 }
             }
 
-            this.Body = bodyBuilder.ToString();
+            this.Body = HttpUtility.UrlDecode(bodyBuilder.ToString().Trim());
+            this.FormData = bodyBuilder
+                .ToString()
+                .Trim()
+                .Split('&')
+                .Select(kvp => kvp.Split('=', 2))
+                .Where(kvp => kvp.Length == 2)
+                .ToDictionary(kvp => HttpUtility.UrlDecode(kvp[0]), kvp => HttpUtility.UrlDecode(kvp[1]));
         }
 
         public HttpMethodType Method { get; }
@@ -115,6 +127,8 @@
         public IEnumerable<Cookie> Cookies => this._cookies.AsReadOnly(); 
 
         public string Body { get; }
+
+        public IDictionary<string, string> FormData { get; set; }
 
         public IDictionary<string, string> SessionData { get; set; }
     }
