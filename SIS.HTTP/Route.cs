@@ -16,5 +16,10 @@
         public HttpMethodType HttpMethod { get; }
 
         public Func<HttpRequest, HttpResponse> Action { get; }
+
+        public override string ToString()
+        {
+            return $"{this.HttpMethod} => {this.Path} ({this.Action.Method.Name})";
+        }
     }
 }
