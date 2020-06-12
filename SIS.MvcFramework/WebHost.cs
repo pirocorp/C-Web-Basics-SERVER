@@ -16,32 +16,20 @@
             application.ConfigureServices();
             application.Configure(routeTable);
 
-            AutoRegisterRoutes(routeTable, application);
+            AutoRegisterStaticFilesRoutes(routeTable);
+            AutoRegisterActionRoutes(routeTable, application);
+
+            Console.WriteLine($"Registered routes:");
 
             foreach (var route in routeTable)
             {
                 Console.WriteLine(route);
             }
 
+            Console.WriteLine();
+
             var httpServer = new HttpServer(80, routeTable);
             await httpServer.StartAsync();
-        }
-
-        private static void AutoRegisterRoutes(List<Route> routeTable, 
-            IMvcApplication application)
-        {
-            var files = Directory.GetFiles("./wwwroot", "*", SearchOption.AllDirectories);
-
-            foreach (var file in files)
-            {
-                var fileContent = File.ReadAllBytes(file);
-                var fileExtension = GetFileExtension(file);
-                var contentType = GetContentType(fileExtension);
-                var fileUrl = GetFileUrl(file);
-
-                routeTable.Add(new Route(HttpMethodType.Get, fileUrl, 
-                    (request) => new FileResponse(fileContent, contentType)));
-            }
         }
 
         private static string GetFileExtension(string file)
@@ -67,5 +55,27 @@
             => file
                 .Replace("./wwwroot", string.Empty)
                 .Replace(@"\", "/");
+
+        private static void AutoRegisterStaticFilesRoutes(List<Route> routeTable)
+        {
+            var files = Directory.GetFiles("./wwwroot", "*", SearchOption.AllDirectories);
+
+            foreach (var file in files)
+            {
+                var fileContent = File.ReadAllBytes(file);
+                var fileExtension = GetFileExtension(file);
+                var contentType = GetContentType(fileExtension);
+                var fileUrl = GetFileUrl(file);
+
+                routeTable.Add(new Route(HttpMethodType.Get, fileUrl, 
+                    (request) => new FileResponse(fileContent, contentType)));
+            }
+        }
+        
+        private static void AutoRegisterActionRoutes(List<Route> routeTable,
+            IMvcApplication application)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

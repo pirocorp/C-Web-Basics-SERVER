@@ -86,7 +86,7 @@
                     }
 
                     Console.WriteLine($"{request.Method} {request.Path}");
-                    Console.WriteLine(new string('=', Console.WindowWidth));
+                    //Console.WriteLine(new string('=', Console.WindowWidth));
 
                     var route = this._routingTable
                         .FirstOrDefault(r => r.HttpMethod == request.Method

@@ -1,9 +1,13 @@
 ﻿<div class="row">
     <div class="jumbotron col-md-12">
         <div class="heading-container bottom-buffer-md">
-            <h1>@Model.Message</h1>
-            <h2>@Model.Year</h2>
-            <img src="/img/cat.jpg" alt="Cute cat" width="400" />
+            <div class="row">
+                <div class="col-6 d-flex align-items-center flex-column justify-content-center">
+                    <h1 class="text-center">@Model.Message</h1>
+                    <h2 class="text-center">@Model.Year</h2>
+                </div>
+                <img class="col-6" src="/img/cat.jpg" alt="Cute cat" width="400" />
+            </div>
             <br />
         </div>
         <h3><a href="/Users/Login">Login</a> to use the Platform.</h3>
