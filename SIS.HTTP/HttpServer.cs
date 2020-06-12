@@ -10,13 +10,19 @@
 
     public class HttpServer : IHttpServer
     {
+        private readonly int _port;
+        private readonly IPAddress _ipAddress;
+
         private readonly TcpListener _tcpListener;
         private readonly IList<Route> _routingTable;
         private readonly IDictionary<string, IDictionary<string, string>> _sessions;
-
+        
         public HttpServer(int port, IList<Route> routingTable)
         {
-            this._tcpListener = new TcpListener(IPAddress.Loopback, port);
+            this._port = port;
+            this._ipAddress = IPAddress.Loopback;
+
+            this._tcpListener = new TcpListener(this._ipAddress, this._port);
             this._routingTable = routingTable;
             this._sessions = new Dictionary<string, IDictionary<string, string>>();
         }
@@ -24,6 +30,8 @@
         public async Task StartAsync()
         {
             this._tcpListener.Start();
+
+            Console.WriteLine($"Listening on {this._ipAddress}:{this._port}");
 
             while (true)
             {

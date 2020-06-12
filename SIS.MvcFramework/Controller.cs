@@ -9,12 +9,17 @@
     {
         protected HttpResponse View([CallerMemberName] string viewName = null)
         {
-            var layout = File.ReadAllText("Views/Shared/_Layout.html");
+            IViewEngine viewEngine = new ViewEngine();
 
             var controllerName = this.GetType().Name.Replace("Controller", string.Empty);
 
-            var html = File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
+            var templateHtml = File.ReadAllText("Views/" + controllerName + "/" + viewName + ".html");
+            var html = viewEngine.GetHtml(templateHtml, null);
+
+            var layout = File.ReadAllText("Views/Shared/_Layout.html");
             var page = layout.Replace("@RenderBody()", html);
+
+            page = viewEngine.GetHtml(page, null);
 
             return new HtmlResponse(page);
         }
