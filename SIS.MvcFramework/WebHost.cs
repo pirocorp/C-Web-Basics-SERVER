@@ -99,6 +99,7 @@
                     .Where(m => 
                         !m.IsSpecialName 
                         && !m.IsConstructor
+                        && m.IsPublic
                         && m.DeclaringType == type
                         && m.GetBaseDefinition().DeclaringType == type);
 
@@ -125,8 +126,11 @@
 
                     var controllerInstance = Activator.CreateInstance(type) as Controller;
 
-                    HttpResponse Action(HttpRequest request) 
-                        => methodInfo.Invoke(controllerInstance, new object[]{request}) as HttpResponse;
+                    HttpResponse Action(HttpRequest request)
+                    {
+                        controllerInstance.Request = request;
+                        return methodInfo.Invoke(controllerInstance, new object[]{}) as HttpResponse;
+                    }
 
                     var route = new Route(httpActionType, url, Action);
                     routeTable.Add(route);

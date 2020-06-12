@@ -68,7 +68,7 @@ namespace SulsApp.Migrations
                     b.ToTable("Submissions");
                 });
 
-            modelBuilder.Entity("SulsApp.Models.User", b =>
+            modelBuilder.Entity("SulsApp.Models.IdentityUser", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -97,7 +97,7 @@ namespace SulsApp.Migrations
                         .WithMany()
                         .HasForeignKey("ProblemId");
 
-                    b.HasOne("SulsApp.Models.User", "User")
+                    b.HasOne("SulsApp.Models.IdentityUser", "IdentityUser")
                         .WithMany()
                         .HasForeignKey("UserId");
                 });
