@@ -2,11 +2,8 @@
 {
     using System;
     using System.Net.Mail;
-    using System.Security.Cryptography;
-    using System.Text;
     using Models;
     using SIS.HTTP;
-    using SIS.HTTP.Responses;
     using SIS.MvcFramework;
 
     public class UsersController : Controller
@@ -71,6 +68,7 @@
             db.SaveChanges();
 
             //TODO: LogIn
+            //TODO: Email already exists
 
             return this.Redirect("/");
         }
