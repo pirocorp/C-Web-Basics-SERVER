@@ -90,7 +90,7 @@
 
                     var route = this._routingTable
                         .FirstOrDefault(r => r.HttpMethod == request.Method
-                                             && r.Path == request.Path);
+                                             && string.Compare(r.Path, request.Path, StringComparison.InvariantCultureIgnoreCase) == 0);
 
                     var response = new HttpResponse(HttpResponseCode.NotFound, new byte[0]);
 

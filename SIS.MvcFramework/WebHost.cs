@@ -74,6 +74,12 @@
             }
         }
         
+        /// <summary>
+        /// Auto register action routes by convention
+        /// /{controller}/{action}
+        /// </summary>
+        /// <param name="routeTable">Route table</param>
+        /// <param name="application">Application context</param>
         private static void AutoRegisterActionRoutes(List<Route> routeTable,
             IMvcApplication application)
         {
