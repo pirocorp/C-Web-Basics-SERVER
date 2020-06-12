@@ -5,7 +5,6 @@
 
     public class UsersController : Controller
     {
-        [HttpGet]
         public HttpResponse Login(HttpRequest request)
         {
             return this.View();
@@ -17,7 +16,6 @@
             return this.View();
         }
 
-        [HttpGet]
         public HttpResponse Register(HttpRequest request)
         {
             return this.View();

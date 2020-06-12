@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
+    using System.Reflection;
     using System.Threading.Tasks;
     using HTTP;
     using HTTP.Responses;
@@ -75,7 +77,55 @@
         private static void AutoRegisterActionRoutes(List<Route> routeTable,
             IMvcApplication application)
         {
-            throw new NotImplementedException();
+            var types = application
+                .GetType()
+                .Assembly
+                .GetTypes()
+                .Where(type => type.IsSubclassOf(typeof(Controller)) && !type.IsAbstract)
+                .ToArray();
+
+            foreach (var type in types)
+            {
+                Console.WriteLine(type.FullName);
+
+                var methods = type
+                    .GetMethods()
+                    .Where(m => 
+                        !m.IsSpecialName 
+                        && !m.IsConstructor
+                        && m.DeclaringType == type
+                        && m.GetBaseDefinition().DeclaringType == type);
+
+                foreach (var methodInfo in methods)
+                {
+                    var url = $"/{type.Name.Replace("Controller", string.Empty)}/{methodInfo.Name}";
+
+                    var attribute = methodInfo
+                        .GetCustomAttributes()
+                        .FirstOrDefault(a => a.GetType().IsSubclassOf(typeof(HttpMethodAttribute)))
+                        as HttpMethodAttribute;
+
+                    var httpActionType = HttpMethodType.Get;
+
+                    if (attribute != null)
+                    {
+                        httpActionType = attribute.Type;
+
+                        if (attribute.Url != null)
+                        {
+                            url = attribute.Url;
+                        }
+                    }
+
+                    var controllerInstance = Activator.CreateInstance(type) as Controller;
+
+                    HttpResponse Action(HttpRequest request) 
+                        => methodInfo.Invoke(controllerInstance, new object[]{request}) as HttpResponse;
+
+                    var route = new Route(httpActionType, url, Action);
+                    routeTable.Add(route);
+                }
+            }
         }
     }
 }

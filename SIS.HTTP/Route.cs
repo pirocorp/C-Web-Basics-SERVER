@@ -19,7 +19,7 @@
 
         public override string ToString()
         {
-            return $"{this.HttpMethod} => {this.Path} ({this.Action.Method.Name})";
+            return $"{this.HttpMethod} => {this.Path}";
         }
     }
 }
