@@ -9,5 +9,9 @@
         void ChangePassword(string username, string newPassword);
 
         int CountUsers();
+
+        bool IsUsernameUsed(string username);
+
+        bool IsEmailUsed(string email);
     }
 }

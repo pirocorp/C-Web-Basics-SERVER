@@ -24,8 +24,8 @@
             return this.View();
         }
 
-        [HttpPost("/Users/Login")]
-        public HttpResponse DoLogin(string username, string password)
+        [HttpPost]
+        public HttpResponse Login(string username, string password)
         {
             var userId = this._usersService.GetUserId(username, password);
 
@@ -44,8 +44,8 @@
             return this.View();
         }
 
-        [HttpPost("/Users/Register")]
-        public HttpResponse DoRegister(RegisterInputModel model)
+        [HttpPost]
+        public HttpResponse Register(RegisterInputModel model)
         {
             if (model.Password != model.ConfirmPassword)
             {
@@ -69,6 +69,16 @@
                 || model.Password.Length > 20)
             {
                 return this.Error("Password should be between 6 and 20 long.");
+            }
+
+            if (this._usersService.IsEmailUsed(model.Email))
+            {
+                return this.Error("Email is already used");
+            }
+
+            if (this._usersService.IsUsernameUsed(model.Username))
+            {
+                return this.Error("Username is already used");
             }
 
             this._usersService.CreateUser(model.Username, model.Email, model.Password);

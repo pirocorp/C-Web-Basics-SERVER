@@ -15,12 +15,22 @@
 
         public HttpResponse Create()
         {
+            if (!this.IsUserLoggedIn())
+            {
+                return this.Redirect("/Users/Login");
+            }
+
             return this.View();
         }
 
-        [HttpPost("/Problems/Create")]
-        public HttpResponse DoCreate(string name, int points)
+        [HttpPost]
+        public HttpResponse Create(string name, int points)
         {
+            if (!this.IsUserLoggedIn())
+            {
+                return this.Redirect("/Users/Login");
+            }
+
             this._problemsService.Create(name, points);
             return this.Redirect("/");
         }

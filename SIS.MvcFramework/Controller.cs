@@ -53,6 +53,9 @@
             this.Request.SessionData["UserId"] = null;
         }
 
+        protected bool IsUserLoggedIn()
+            => this.User != null;
+
         private HttpResponse ViewByName<T>(string viewPath, object viewModel)
         {
             IViewEngine viewEngine = new ViewEngine();

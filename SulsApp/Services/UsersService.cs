@@ -55,6 +55,12 @@
         public int CountUsers()
             => this._db.Users.Count();
 
+        public bool IsUsernameUsed(string username)
+            => this._db.Users.Any(u => u.Username == username);
+
+        public bool IsEmailUsed(string email)
+            => this._db.Users.Any(u => u.Email == email);
+
         private string Hash(string input)
         {
             var crypt = new SHA256Managed();
