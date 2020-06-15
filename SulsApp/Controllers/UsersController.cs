@@ -24,7 +24,18 @@
         [HttpPost("/Users/Login")]
         public HttpResponse DoLogin()
         {
-            return this.View();
+            var username = this.Request.FormData["username"];
+            var password = this.Request.FormData["password"];
+
+            var userId = this._usersService.GetUserId(username, password);
+
+            if (userId == null)
+            {
+                return this.Redirect("/Users/Login");
+            }
+
+            this.SignIn(userId);
+            return this.Redirect("/");
         }
 
         public HttpResponse Register()
@@ -66,8 +77,16 @@
 
             this._usersService.CreateUser(username, email, password);
 
-            //TODO: LogIn
+            var userId = this._usersService.GetUserId(username, password);
+            this.SignIn(userId);
+
             //TODO: Email already exists
+            return this.Redirect("/");
+        }
+
+        public HttpResponse Logout()
+        {
+            this.SignOut();
 
             return this.Redirect("/");
         }

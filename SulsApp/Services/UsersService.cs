@@ -29,13 +29,14 @@
             this._db.SaveChanges();
         }
 
-        public bool IsValidUser(string username, string password)
+        public string GetUserId(string username, string password)
         {
             var hashedPassword = this.Hash(password);
 
             return this._db.Users
-                .Any(u => u.Username == username 
-                       && u.Password == hashedPassword);
+                .Where(u => u.Username == username && u.Password == hashedPassword)
+                .Select(x => x.Id)
+                .FirstOrDefault();
         }
 
         public void ChangePassword(string username, string newPassword)
