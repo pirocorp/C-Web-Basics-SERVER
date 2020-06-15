@@ -147,20 +147,27 @@
 
                         foreach (var parameter in actionInfo.GetParameters())
                         {
-                            object parameterValue = request
-                                .QueryData
-                                .FirstOrDefault(x => x.Key.ToLower() == parameter.Name.ToLower())
-                                .Value;
+                            var parameterName = parameter.Name;
 
-                            if (parameterValue == null)
+                            object value = Convert.ChangeType(
+                                GetParameterValue(request, parameterName), parameter.ParameterType);
+
+                            if (value == null)
                             {
-                                parameterValue = request
-                                    .FormData
-                                    .FirstOrDefault(x => x.Key.ToLower() == parameter.Name.ToLower())
-                                    .Value;
-                            }
+                                var parameterInstance = Activator.CreateInstance(parameter.ParameterType);
 
-                            parameterValues.Add(Convert.ChangeType(parameterValue, parameter.ParameterType));
+                                foreach (var property in parameter.ParameterType.GetProperties(BindingFlags.Public | BindingFlags.Instance))
+                                {
+                                    var propertyValue = GetParameterValue(request, property.Name);
+                                    property.SetValue(parameterInstance, Convert.ChangeType(propertyValue, property.PropertyType));
+                                }
+
+                                parameterValues.Add(parameterInstance);
+                            }
+                            else
+                            {
+                                parameterValues.Add(value);
+                            }
                         }
 
                         var response = actionInfo.Invoke(controllerInstance,
@@ -174,6 +181,26 @@
                     routeTable.Add(route);
                 }
             }
+        }
+
+        private static object GetParameterValue(HttpRequest request, string name)
+        {
+            name = name.ToLower();
+
+            object value = request
+                .QueryData
+                .FirstOrDefault(x => x.Key.ToLower() == name)
+                .Value;
+
+            if (value == null)
+            {
+                value = request
+                    .FormData
+                    .FirstOrDefault(x => x.Key.ToLower() == name)
+                    .Value;
+            }
+
+            return value;
         }
     }
 }

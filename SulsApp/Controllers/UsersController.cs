@@ -6,6 +6,7 @@
     using SIS.HTTP;
     using SIS.HTTP.Logging;
     using SIS.MvcFramework;
+    using ViewModels.Users;
 
     public class UsersController : Controller
     {
@@ -44,42 +45,37 @@
         }
 
         [HttpPost("/Users/Register")]
-        public HttpResponse DoRegister()
+        public HttpResponse DoRegister(RegisterInputModel model)
         {
-            var username = this.Request.FormData["username"];
-            var email = this.Request.FormData["email"];
-            var password = this.Request.FormData["password"];
-            var confirmPassword = this.Request.FormData["confirmPassword"];
-
-            if (password != confirmPassword)
+            if (model.Password != model.ConfirmPassword)
             {
                 return this.Error("Confirm password does not match password");
             }
 
-            if (string.IsNullOrWhiteSpace(username)
-                || username.Length < 5
-                || username.Length > 20)
+            if (string.IsNullOrWhiteSpace(model.Username)
+                || model.Username.Length < 5
+                || model.Username.Length > 20)
             {
                 return this.Error("Username should be between 5 and 20 long.");
             }
 
-            if (!IsValid(email))
+            if (!IsValid(model.Email))
             {
                 return this.Error("Invalid email.");
             }
 
-            if (string.IsNullOrWhiteSpace(password)
-                || password.Length < 6
-                || password.Length > 20)
+            if (string.IsNullOrWhiteSpace(model.Password)
+                || model.Password.Length < 6
+                || model.Password.Length > 20)
             {
                 return this.Error("Password should be between 6 and 20 long.");
             }
 
-            this._usersService.CreateUser(username, email, password);
+            this._usersService.CreateUser(model.Username, model.Email, model.Password);
 
-            var userId = this._usersService.GetUserId(username, password);
+            var userId = this._usersService.GetUserId(model.Username, model.Password);
             this.SignIn(userId);
-            this._loggerService.Log("New user: " + username);
+            this._loggerService.Log("New user: " + model.Username);
 
             //TODO: Email already exists
             return this.Redirect("/");
