@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using Controllers;
+    using Microsoft.EntityFrameworkCore;
     using SIS.HTTP;
     using SIS.MvcFramework;
 
@@ -10,7 +11,7 @@
         public void ConfigureServices()
         {
             var db = new ApplicationDbContext();
-            db.Database.EnsureCreated();
+            db.Database.Migrate();
         }
 
         public void Configure(IList<Route> routeTable)

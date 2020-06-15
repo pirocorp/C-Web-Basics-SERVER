@@ -3,11 +3,19 @@
     using System;
     using System.Net.Mail;
     using Models;
+    using Services;
     using SIS.HTTP;
     using SIS.MvcFramework;
 
     public class UsersController : Controller
     {
+        private readonly IUsersService _usersService;
+
+        public UsersController()
+        {
+            this._usersService = new UsersService(new ApplicationDbContext());
+        }
+
         public HttpResponse Login()
         {
             return this.View();
@@ -56,16 +64,7 @@
                 return this.Error("Password should be between 6 and 20 long.");
             }
 
-            var user = new User()
-            {
-                Username = username,
-                Email = email,
-                Password = this.Hash(password),
-            };
-
-            var db = new ApplicationDbContext();
-            db.Users.Add(user);
-            db.SaveChanges();
+            this._usersService.CreateUser(username, email, password);
 
             //TODO: LogIn
             //TODO: Email already exists
