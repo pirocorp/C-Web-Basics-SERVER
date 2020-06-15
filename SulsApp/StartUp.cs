@@ -11,8 +11,6 @@
         public void ConfigureServices(IServiceCollection serviceCollection)
         {
             serviceCollection.Add<IUsersService, UsersService>();
-            serviceCollection.Add<ILogger, ConsoleLogger>();
-
         }
 
         public void Configure(IList<Route> routeTable)

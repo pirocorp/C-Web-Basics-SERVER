@@ -4,6 +4,7 @@
     using System.Net.Mail;
     using Services;
     using SIS.HTTP;
+    using SIS.HTTP.Logging;
     using SIS.MvcFramework;
 
     public class UsersController : Controller
