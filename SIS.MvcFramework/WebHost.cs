@@ -1,5 +1,6 @@
 ﻿namespace SIS.MvcFramework
 {
+    using System;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -112,11 +113,11 @@
                         && m.DeclaringType == controllerType
                         && m.GetBaseDefinition().DeclaringType == controllerType);
 
-                foreach (var methodInfo in methods)
+                foreach (var actionInfo in methods)
                 {
-                    var url = $"/{controllerType.Name.Replace("Controller", string.Empty)}/{methodInfo.Name}";
+                    var url = $"/{controllerType.Name.Replace("Controller", string.Empty)}/{actionInfo.Name}";
 
-                    var attribute = methodInfo
+                    var attribute = actionInfo
                         .GetCustomAttributes()
                         .FirstOrDefault(a => a.GetType().IsSubclassOf(typeof(HttpMethodAttribute)))
                         as HttpMethodAttribute;
@@ -141,8 +142,29 @@
                     HttpResponse Action(HttpRequest request)
                     {
                         controllerInstance.Request = request;
-                        var response = methodInfo.Invoke(controllerInstance,
-                            new object[]{}) as HttpResponse;
+
+                        var parameterValues = new List<object>();
+
+                        foreach (var parameter in actionInfo.GetParameters())
+                        {
+                            object parameterValue = request
+                                .QueryData
+                                .FirstOrDefault(x => x.Key.ToLower() == parameter.Name.ToLower())
+                                .Value;
+
+                            if (parameterValue == null)
+                            {
+                                parameterValue = request
+                                    .FormData
+                                    .FirstOrDefault(x => x.Key.ToLower() == parameter.Name.ToLower())
+                                    .Value;
+                            }
+
+                            parameterValues.Add(Convert.ChangeType(parameterValue, parameter.ParameterType));
+                        }
+
+                        var response = actionInfo.Invoke(controllerInstance,
+                            parameterValues.ToArray()) as HttpResponse;
 
                         return response;
                     }

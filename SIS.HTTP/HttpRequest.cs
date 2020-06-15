@@ -18,6 +18,7 @@
 
             this.SessionData = new Dictionary<string, string>();
             this.FormData = new Dictionary<string, string>();
+            this.QueryData = new Dictionary<string, string>();
 
             var lines = httpRequestAsString.Split(
                 new []{ HttpConstants.NewLine }, 
@@ -107,18 +108,25 @@
             }
 
             this.Body = HttpUtility.UrlDecode(bodyBuilder.ToString().Trim());
-            this.FormData = bodyBuilder
-                .ToString()
-                .Trim()
-                .Split('&')
-                .Select(kvp => kvp.Split('=', 2))
-                .Where(kvp => kvp.Length == 2)
-                .ToDictionary(kvp => HttpUtility.UrlDecode(kvp[0]), kvp => HttpUtility.UrlDecode(kvp[1]));
+            this.Query = string.Empty;
+
+            if (this.Path.Contains("?"))
+            {
+                var parts = this.Path.Split("?", 2);
+
+                this.Path = parts[0];
+                this.Query = parts[1];
+            }
+
+            this.ParseData(this.FormData, this.Body);
+            this.ParseData(this.QueryData, this.Query);
         }
 
         public HttpMethodType Method { get; }
 
         public string Path { get; }
+
+        public string Query { get; set; }
 
         public HttpVersionType Version { get; }
 
@@ -130,6 +138,16 @@
 
         public IDictionary<string, string> FormData { get; set; }
 
+        public IDictionary<string, string> QueryData { get; set; }
+
         public IDictionary<string, string> SessionData { get; set; }
+
+        private void ParseData(IDictionary<string, string> collection, string input)
+            => input
+                .Split('&')
+                .Select(kvp => kvp.Split('=', 2))
+                .Where(kvp => kvp.Length == 2)
+                .ToList()
+                .ForEach(kvp => collection[HttpUtility.UrlDecode(kvp[0])] = HttpUtility.UrlDecode(kvp[1]));
     }
 }
