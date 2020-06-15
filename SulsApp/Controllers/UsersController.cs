@@ -2,7 +2,6 @@
 {
     using System;
     using System.Net.Mail;
-    using Models;
     using Services;
     using SIS.HTTP;
     using SIS.MvcFramework;
@@ -10,10 +9,12 @@
     public class UsersController : Controller
     {
         private readonly IUsersService _usersService;
+        private readonly ILogger _loggerService;
 
-        public UsersController()
+        public UsersController(IUsersService usersService, ILogger loggerService)
         {
-            this._usersService = new UsersService(new ApplicationDbContext());
+            this._usersService = usersService;
+            this._loggerService = loggerService;
         }
 
         public HttpResponse Login()
@@ -35,6 +36,7 @@
             }
 
             this.SignIn(userId);
+            this._loggerService.Log("User logged in: " + username);
             return this.Redirect("/");
         }
 
@@ -79,6 +81,7 @@
 
             var userId = this._usersService.GetUserId(username, password);
             this.SignIn(userId);
+            this._loggerService.Log("New user: " + username);
 
             //TODO: Email already exists
             return this.Redirect("/");
