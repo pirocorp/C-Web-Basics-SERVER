@@ -2,14 +2,16 @@
 {
     using System.IO;
     using System.Runtime.CompilerServices;
-    using System.Security.Cryptography;
-    using System.Text;
     using HTTP;
     using HTTP.Responses;
 
     public abstract class Controller
     {
         public HttpRequest Request { get; set; }
+
+        public string User => this.Request.SessionData.ContainsKey("UserId")
+            ? this.Request.SessionData["UserId"]
+            : null;
 
         protected HttpResponse View<T>(T viewModel = null, 
             [CallerMemberName] string viewName = null)
@@ -41,18 +43,14 @@
             return new RedirectResponse(url);
         }
 
-        protected string Hash(string input)
+        protected void SignIn(string userId)
         {
-            var crypt = new SHA256Managed();
-            var hash = new StringBuilder();
-            var crypto = crypt.ComputeHash(Encoding.UTF8.GetBytes(input));
-            
-            foreach (byte theByte in crypto)
-            {
-                hash.Append(theByte.ToString("x2")); //255 => FF
-            }
+            this.Request.SessionData["UserId"] = userId;
+        }
 
-            return hash.ToString();
+        protected void SignOut()
+        {
+            this.Request.SessionData["UserId"] = null;
         }
 
         private HttpResponse ViewByName<T>(string viewPath, object viewModel)
@@ -60,12 +58,12 @@
             IViewEngine viewEngine = new ViewEngine();
 
             var templateHtml = File.ReadAllText(viewPath);
-            var html = viewEngine.GetHtml(templateHtml, viewModel);
+            var html = viewEngine.GetHtml(templateHtml, viewModel, this.User);
 
             var layout = File.ReadAllText("Views/Shared/_Layout.html");
             var page = layout.Replace("@RenderBody()", html);
 
-            page = viewEngine.GetHtml(page, viewModel);
+            page = viewEngine.GetHtml(page, viewModel, this.User);
 
             return new HtmlResponse(page);
         }

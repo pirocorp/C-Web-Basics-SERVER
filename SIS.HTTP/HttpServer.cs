@@ -7,6 +7,7 @@
     using System.Net.Sockets;
     using System.Text;
     using System.Threading.Tasks;
+    using Logging;
 
     public class HttpServer : IHttpServer
     {
@@ -15,15 +16,17 @@
 
         private readonly TcpListener _tcpListener;
         private readonly IList<Route> _routingTable;
+        private readonly ILogger _logger;
         private readonly IDictionary<string, IDictionary<string, string>> _sessions;
         
-        public HttpServer(int port, IList<Route> routingTable)
+        public HttpServer(int port, IList<Route> routingTable, ILogger logger)
         {
             this._port = port;
             this._ipAddress = IPAddress.Loopback;
 
             this._tcpListener = new TcpListener(this._ipAddress, this._port);
             this._routingTable = routingTable;
+            this._logger = logger;
             this._sessions = new Dictionary<string, IDictionary<string, string>>();
         }
 
@@ -31,7 +34,7 @@
         {
             this._tcpListener.Start();
 
-            Console.WriteLine($"Listening on {this._ipAddress}:{this._port}");
+            this._logger.Log($"Listening on {this._ipAddress}:{this._port}");
 
             while (true)
             {
@@ -85,8 +88,7 @@
                         request.SessionData = this._sessions[newSessionId];
                     }
 
-                    Console.WriteLine($"{request.Method} {request.Path}");
-                    //Console.WriteLine(new string('=', Console.WindowWidth));
+                    this._logger.Log($"{request.Method} {request.Path}");
 
                     var route = this._routingTable
                         .FirstOrDefault(r => r.HttpMethod == request.Method
